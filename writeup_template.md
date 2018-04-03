@@ -22,22 +22,14 @@
 
 #### 1. Provide a Writeup / README that includes all the rubric points and how you addressed each one.  You can submit your writeup as markdown or pdf.  
 
-You're reading it! Below I describe how I addressed each rubric point and where in my code each point is handled.
+`*this`
 
 ### Explain the Starter Code
 
 #### 1. Explain the functionality of what's provided in `motion_planning.py` and `planning_utils.py`
-These scripts contain a basic planning implementation that includes...
+The path planning utils file contains functions to create a descritized grid, to run an a_star search on a grid with a start and goal location, and a heuristic function for it. It also contains an enumerated action class with a function to return all possible actions from a given state.
 
-And here's a lovely image of my results (ok this image has nothing to do with it, but it's a nice example of how to include images in your writeup!)
-![Top Down View](./misc/high_up.png)
-
-Here's | A | Snappy | Table
---- | --- | --- | ---
-1 | `highlight` | **bold** | 7.41
-2 | a | b | c
-3 | *italic* | text | 403
-4 | 2 | 3 | abcd
+The motion planning file contains the code in charge of the brain of the drone. The MotionPlanning class is derived from the Udacidrone and uses callbacks to decide what the drone should do next. 
 
 ### Implementing Your Path Planning Algorithm
 
