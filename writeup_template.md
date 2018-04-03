@@ -29,7 +29,7 @@
 #### 1. Explain the functionality of what's provided in `motion_planning.py` and `planning_utils.py`
 The path planning utils file contains functions to create a descritized grid, to run an a_star search on a grid with a start and goal location, and a heuristic function for it. It also contains an enumerated action class with a function to return all possible actions from a given state.
 
-The motion planning file contains the code in charge of the brain of the drone. The MotionPlanning class is derived from the Udacidrone and uses callbacks to decide what the drone should do next. 
+The motion planning file contains the code in charge of the brain of the drone. The MotionPlanning class is derived from the Udacidrone and uses callbacks to decide what the drone should do next. This class manages the states the drone could be in, the transitions between states, and what to do in each state. 
 
 ### Implementing Your Path Planning Algorithm
 
