@@ -55,6 +55,10 @@ class Action(Enum):
     EAST = (0, 1, 1)
     NORTH = (-1, 0, 1)
     SOUTH = (1, 0, 1)
+    NORTHWEST = (-1,-1,np.sqrt(2))
+    NORTHEAST = (-1, 1,np.sqrt(2))
+    SOUTHWEST = ( 1,-1,np.sqrt(2))
+    SOUTHEAST = ( 1, 1,np.sqrt(2))
 
     @property
     def cost(self):
@@ -76,6 +80,8 @@ def valid_actions(grid, current_node):
     # check if the node is off the grid or
     # it's an obstacle
 
+
+
     if x - 1 < 0 or grid[x - 1, y] == 1:
         valid_actions.remove(Action.NORTH)
     if x + 1 > n or grid[x + 1, y] == 1:
@@ -85,10 +91,24 @@ def valid_actions(grid, current_node):
     if y + 1 > m or grid[x, y + 1] == 1:
         valid_actions.remove(Action.EAST)
 
+    if x - 1 < 0 or y - 1 < 0 or grid[x - 1, y - 1] == 1:
+        valid_actions.remove(Action.NORTHWEST)
+    if x - 1 < 0 or y + 1 > m or grid[x - 1, y + 1] == 1:
+        valid_actions.remove(Action.NORTHEAST)
+    if x + 1 > m or y - 1 < 0 or grid[x + 1, y - 1] == 1:
+        valid_actions.remove(Action.SOUTHWEST)
+    if x + 1 > m or y + 1 > m or grid[x + 1, y + 1] == 1:
+        valid_actions.remove(Action.SOUTHEAST)
+
+
     return valid_actions
 
 
 def a_star(grid, h, start, goal):
+    if(grid[goal] == 1):
+        print("Goal {} is not valid, searching for nearest open point...".format(goal))
+        goal = nearest_open(grid,start,goal)
+        print("new goal found: {}".format(goal))
 
     path = []
     path_cost = 0
@@ -125,6 +145,7 @@ def a_star(grid, h, start, goal):
                     queue.put((queue_cost, next_node))
              
     if found:
+        print('retracing steps...')
         # retrace steps
         n = goal
         path_cost = branch[n][0]
@@ -132,15 +153,57 @@ def a_star(grid, h, start, goal):
         while branch[n][1] != start:
             path.append(branch[n][1])
             n = branch[n][1]
+            print('.', end='')
         path.append(branch[n][1])
+        print('')
     else:
         print('**********************')
         print('Failed to find a path!')
         print('**********************') 
+    print('returned path')
     return path[::-1], path_cost
 
+def col_prune(path):
+    pruned_path = [p for p in path]
+ 
+    pruned = True
+    while pruned:
+        for i in range(len(pruned_path) - 2):
+            pruned = False
+            p1 = point(pruned_path[i])
+            p2 = point(pruned_path[i+1])
+            p3 = point(pruned_path[i+2])
+            if collinearity_check(p1, p2, p3):
+                del pruned_path[i+1]
+                pruned = True
+                break
+    return pruned_path
+
+def point(p):
+        return np.array([p[0], p[1], 1.]).reshape(1,-1)
+
+def collinearity_check(p1, p2, p3, epsilon=1e-6):
+    m = np.concatenate((p1, p2, p3), 0)
+    det = np.linalg.det(m)
+    return abs(det) < epsilon
 
 
 def heuristic(position, goal_position):
     return np.linalg.norm(np.array(position) - np.array(goal_position))
+
+def nearest_open(grid,start,goal):
+    actions = list(Action)
+    nearest_point = start
+    for i in range(len(actions)):
+        temp_point = goal
+        while (temp_point[0] > 0 and temp_point[0] < len(grid)) and \
+        (temp_point[1] > 0 and temp_point[1] < len(grid[0])):
+            
+            if grid[temp_point[0],temp_point[1]] == 0:
+                if heuristic(temp_point, goal) < heuristic(nearest_point,goal):
+                    nearest_point = temp_point
+                break
+            temp_point = tuple(np.add(actions[i].delta, temp_point))
+    return nearest_point
+
 
